@@ -1,7 +1,5 @@
-com/cmg/spcl/entities/CommonResult.class
-com/cmg/spcl/PaymentMain8001.class
-com/cmg/spcl/dao/PaymentDao.class
-com/cmg/spcl/service/impl/PaymentServiceImpl.class
-com/cmg/spcl/service/PaymentService.class
-com/cmg/spcl/entities/Payment.class
-com/cmg/spcl/crontroller/PaymentController.class
+com\cmg\spcl\dao\PaymentDao.class
+com\cmg\spcl\service\PaymentService.class
+com\cmg\spcl\PaymentMain8001Application.class
+com\cmg\spcl\controller\PaymentController.class
+com\cmg\spcl\service\impl\PaymentServiceImpl.class

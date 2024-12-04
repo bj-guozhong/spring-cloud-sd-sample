@@ -19,6 +19,18 @@
     </properties>
 
     <dependencies>
+        <!-- Eureka client -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <version>2.2.6.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <!-- Spring Boot Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -56,6 +68,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
             <version>2.0.4.RELEASE</version>
+        </dependency>
+
+        <!-- 自定义公共属性 -->
+        <dependency>
+            <groupId>com.cmg.spcl</groupId>
+            <artifactId>cloud-api-common</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

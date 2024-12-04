@@ -20,6 +20,9 @@ public class OrderController {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
 
     public static final String PAYMENT_URL = "http://localhost:8001";
+    // 改为eureka中的服务名,需要启动负载均衡
+    //public static final String PAYMENT_URL = "http://CLOUD-PAYMENT-SERVICE";
+
     @Resource
     private RestTemplate restTemplate;
 
