@@ -97,7 +97,7 @@
                 <configuration>
                     <addResources>true</addResources>
                     <!-- 主启动类 -->
-                    <mainClass>PaymentMain8001</mainClass>
+                    <mainClass>PaymentMain8001Application</mainClass>
                 </configuration>
                 <executions>
                     <execution>

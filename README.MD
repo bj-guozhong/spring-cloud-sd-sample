@@ -1,6 +1,6 @@
 ## This project for study spring cloud sample
 
-###2024-12-01
+### 2024-12-01
 
 1.Create new project,name is spring-cloud-sd-sample
 - update pom.xml
@@ -87,7 +87,7 @@ eureka.client.service-url.defaultZone=http://${eureka.instance.hostname}:${serve
 - 启动类声明：@EnableEurekaServer
 - 访问http://localhost:7001 即可看到Eureka的主页，里面包括注册进的8001微服务
 
-###2024-12-04  
+### 2024-12-04  
 1.Create new moudle,name is cloud-eureka-server7002,cloud-provider-payment8002,以支持集群服务   
 2.改造80微服务，增加配置：ApplicationContextConfig类，定义RestTemplate工具并注解@LoadBalanced以支持负载均衡的能力
 3.改造controller中的微服务地址由http://localhost:8001改为http://CLOUD-PAYMENT-SERVICE，其中CLOUD-PAYMENT-SERVICE是8001和8002定义的微服务名称  
@@ -118,8 +118,60 @@ eureka.instance.prefer-ip-address=true
 - 负载均衡： 提供对注册服务的负载均衡能力（通常结合 Ribbon 或 Spring Cloud LoadBalancer 使用）。  
 - 健康检查： 定期向 Eureka 服务端发送心跳，报告当前服务的健康状态。  
 
-###2024-12-05
+### 2024-12-05
 
-1.Eureka自我保护理论知识
-2.关闭eureka的自我保护
- 
+1.Eureka自我保护理论知识  
+2.关闭eureka的自我保护,在7001的eureka的server微服务application.properties中add:
+```properties
+#关闭自我保护机制
+eureka.server.enable-self-preservation=false
+eureka.server.eviction-interval-timer-in-ms=2000
+```
+8001客户端update:
+```properties
+#eureka客户端向服务端发送心跳的时间间隔，单位为秒（默认30秒）
+eureka.instance.lease-renewal-interval-in-seconds=1
+#eureka服务端在收到最后一次心跳后等待时间上限，单位为秒（默认90秒），超时将剔出服务
+eureka.instance.lease-expiration-duration-in-seconds=2
+```
+
+### 2024-12-06
+1.Eureka2.0已停更，考虑使用Zookeeper代替：
+- 官网下载Zookeeper，我使用的是win版，注意别下错了，要编译后的：
+https://dlcdn.apache.org/zookeeper/zookeeper-3.9.3/apache-zookeeper-3.9.3-bin.tar.gz  
+- 解压，修改conf中的zoo_sample.cfg -> zoo.cfg 内容中只需要改动本地数据目录：dataDir=D:/temp/zookeeper
+- 启动：bin/目录，先启动zkServer.cmd ,再启动zkCli.cmd ,见到Welcome to ZooKeeper!即启动成功。
+2.Create new moudle,name is cloud-provider-payment8004
+- 修改pom.xml add:
+```xml
+    <!-- Zookeeper client -->
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-zookeeper-discovery</artifactId>
+        <version>2.2.5.RELEASE</version>
+    </dependency>
+```
+- 修改application.properties,add:
+```properties
+spring.cloud.zookeeper.connect-string=localhost:2181
+```
+- 启动类，add 注解：@EnableDiscoveryClient
+- 启动之后，如果有jar冲突问题，先在pom中排除再引入对应的jar即可，之后在zookeeper启动台测试：
+```shell
+[zk: localhost:2181(CONNECTED) 3] ls /
+[services, zookeeper]
+[zk: localhost:2181(CONNECTED) 7] ls /services
+[cloud-payment-service8004]
+[zk: localhost:2181(CONNECTED) 8] ls /services/cloud-payment-service8004
+[9a6c52e1-ddc6-40a6-936e-198038e8f8af]
+[zk: localhost:2181(CONNECTED) 9] ls /services/cloud-payment-service8004/9a6c52e1-ddc6-40a6-936e-198038e8f8af
+[]
+[zk: localhost:2181(CONNECTED) 10] get /services/cloud-payment-service8004/9a6c52e1-ddc6-40a6-936e-198038e8f8af
+{"name":"cloud-payment-service8004","id":"9a6c52e1-ddc6-40a6-936e-198038e8f8af","address":"ZHANGGUOZHONG","port":8004,"sslPort":null,"payload":{"@class":"org.springframework.cloud.zookeeper.discovery.ZookeeperInstance","id":"application-1","name":"cloud-payment-service8004","metadata":{"instance_status":"UP"}},"registrationTimeUTC":1733454231753,"serviceType":"DYNAMIC","uriSpec":{"parts":[{"value":"scheme","variable":true},{"value":"://","variable":false},{"value":"address","variable":true},{"value":":","variable":false},{"value":"port","variable":true}]}}
+
+```
+即可看到刚刚成功注册进zookeeper的服务cloud-payment-service8004
+- zookeeper节点是临时的，停掉微服务8004之后，过一会儿在zookeepe中就消失了，重启启动8004微服务之后，zookeeper会再发现，但是流水号不一样了。
+3.Create new moudle,name is cloud-consumerzk-order80.
+- 定义使用zookeeper的消费者.
+
