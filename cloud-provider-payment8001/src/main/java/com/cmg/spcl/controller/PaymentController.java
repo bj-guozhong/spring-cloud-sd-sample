@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/scs")
@@ -64,5 +65,15 @@ public class PaymentController {
             LOGGER.info(instanceInfo.getInstanceId()+"\t"+instanceInfo.getHost()+"\t"+instanceInfo.getPort()+"\t"+instanceInfo.getUri());
         }
         return this.discoveryClient;
+    }
+
+    @GetMapping(value="/payment/feign/timeout")
+    public String paymentFeignTimeout(){
+        try{
+            TimeUnit.SECONDS.sleep(3);
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+        return serverPort;
     }
 }
