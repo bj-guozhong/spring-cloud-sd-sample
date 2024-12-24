@@ -41,7 +41,7 @@ public class PaymentController {
         }
     }
 
-    @RequestMapping(value = "/payment/searchById",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/payment/get",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResult searchById(HttpServletRequest request, @RequestParam("sid") String sid){
 
         LOGGER.info("ready to search info by sid:"+sid);
@@ -54,7 +54,7 @@ public class PaymentController {
         }
     }
 
-    @RequestMapping(value="/payment/discovery",method = RequestMethod.GET)
+    @RequestMapping(value="/payment/lb",method = RequestMethod.GET)
     public Object discovery(){
         List<String> services = discoveryClient.getServices();
         for(String element:services){
@@ -67,7 +67,7 @@ public class PaymentController {
         return this.discoveryClient;
     }
 
-    @GetMapping(value="/payment/feign/timeout")
+    @RequestMapping(value="/payment/port",method = RequestMethod.GET)
     public String paymentFeignTimeout(){
         try{
             TimeUnit.SECONDS.sleep(3);

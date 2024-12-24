@@ -25,6 +25,13 @@
             <version>2.2.7.RELEASE</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.netflix.hystrix</groupId>
+            <artifactId>hystrix-metrics-event-stream</artifactId>
+            <version>1.5.18</version>
+        </dependency>
+
+
         <!-- Eureka client -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

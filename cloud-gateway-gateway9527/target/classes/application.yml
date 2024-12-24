@@ -1,0 +1,45 @@
+server:
+  port: 9527
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+
+# gateway config
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true #开启从注册中心动态创建路由的功能，利用微服务进行路由
+      routes:
+        - id: payment-service-get
+          #uri: http://localhost:8001
+          uri: lb://cloud-payment-service #匹配后提供服务的路由地址
+          predicates:
+            - Path=/scs/payment/get/**
+        - id: payment-service-lb
+          #uri: http://localhost:8001
+          uri: lb://cloud-payment-service
+          predicates:
+            - Path=/scs/payment/lb/**
+        - id: payment-service-port
+          #uri: http://localhost:8001
+          uri: lb://cloud-payment-service
+          #filters:
+          #  - AddRequestParameter = X-Request-Id,1024
+          predicates:
+            - Path=/scs/payment/port/**
+            #- After=2024-12-25T11:36:27.755+08:00[Asia/Shanghai] #在该时间节点之后才可以访问
+
+# eureka config
+eureka:
+  instance:
+    hostname: cloud-gateway-service
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone:  http://localhost:7001/eureka

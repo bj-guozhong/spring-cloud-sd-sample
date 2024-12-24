@@ -1,0 +1,4 @@
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-consumer-feign-hystrix-order80/src/main/java/com/cmg/spcl/controller/OrderHystrixController.java
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-consumer-feign-hystrix-order80/src/main/java/com/cmg/spcl/OrderFeignHystrixMainApplication.java
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-consumer-feign-hystrix-order80/src/main/java/com/cmg/spcl/service/PaymentHystrixService.java
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-consumer-feign-hystrix-order80/src/main/java/com/cmg/spcl/service/PaymentFallbackService.java

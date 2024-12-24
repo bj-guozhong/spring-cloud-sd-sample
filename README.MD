@@ -175,22 +175,20 @@ spring.cloud.zookeeper.connect-string=localhost:2181
 3.Create new moudle,name is cloud-consumerzk-order80.
 - 定义使用zookeeper的消费者.
 
-###2024-12-19
-
-1.OpenFeign的使用,openfeign默认支持Ribbon  
-- Create new moudle,name is cloud-payment-feign-order80  
+### 2024-12-19
+1.OpenFeign的使用,openfeign默认支持Ribbon:Create new moudle,name is cloud-payment-feign-order80   
 2.启动类支持feign,add @EnableFeignClients  
 3.service调用服务，add @FeignClient(value="CLOUD-PAYMENT-SERVICE"),需要注意，@GetMapping(value = "/scs/payment/searchById"）此处的value地址需要和8001服务的上下文一致。  
 4.测试：需要启动7001 eureka服务，启动8001 provider服务，再启动feign的80服务。  
-5.openfeign的超时控制，
+5.openfeign的超时控制，   
 6.Hystrix的学习
 **理论**  
-- 处理分布式系统所面临的问题，断路器，处理容错，服务容断，防止雪崩。
-- 服务降级（服务器忙，请稍后再试）、熔断（类比保险丝达到最大服务访问后，直接拒绝访问，拉闸限电）、限流（秒杀高并发，有序进行）、接近实时的监控。
-- 停更
-**实践**
-- Create new moudle,name is cloud-provider-hystrix-payment8001
-- pom.xml支持
+  - 处理分布式系统所面临的问题，断路器，处理容错，服务容断，防止雪崩。
+  - 服务降级（服务器忙，请稍后再试）、熔断（类比保险丝达到最大服务访问后，直接拒绝访问，拉闸限电）、限流（秒杀高并发，有序进行）、接近实时的监控。
+  - 停更
+  **实践**
+  - Create new moudle,name is cloud-provider-hystrix-payment8001
+  - pom.xml支持
 ```properties
         <!-- hystrix -->
         <dependency>
@@ -201,10 +199,9 @@ spring.cloud.zookeeper.connect-string=localhost:2181
 ```
 - jmeter高并发测试，参考：https://jmeter.apache.org/
 
-###2024-12-20
-1.Create new moudle,name is cloud-consumer-feign-hystrix-order80
-- 在高并发情景下，增加80服务，看系统响应情况。
-2.超时，不再等待。出错要有兜底。
+### 2024-12-20
+1.Create new moudle,name is cloud-consumer-feign-hystrix-order80,在高并发情景下，增加80服务，看系统响应情况。   
+2.超时，不再等待。出错要有兜底。 
 - 超时处理，主启动类增加@EnableCircuitBreaker注解，业务类增加@HystrixCommand注解。即服务端降级配置
 ```java
     //超时，配置超时不再等待，另寻解决方案。
@@ -318,7 +315,159 @@ commandProperties = {
     @HystrixProperty (name = "requestLog enabled", value = "true"),
 }
 ```
+### 2024-12-23
+1.Hystrix图形化Dashboard搭建：
+- Create new moudle,name is cloud-consumer-hystrix-dashboard9001
+- 配置hystrix-dashboard,注意在8001中使用以下代码：
+```java
+    /**
+     *此配置是为了服务监控而配置，与服务容鑽本身无光，springcLoud升級后的坑
+     *ServletRegistrationBean因为springboot的默认路經不是"/hystrix.stream"，
+     *只要在自己的项目里配置上下面的servlet就可以了
+     */
+    @Bean
+    public ServletRegistrationBean<HystrixMetricsStreamServlet> hystrixMetricsStreamServlet() {
+        HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();
+        ServletRegistrationBean<HystrixMetricsStreamServlet> registrationBean = new ServletRegistrationBean<>(streamServlet);
+        registrationBean.setLoadOnStartup(1);
+        registrationBean.addUrlMappings("/hystrix.stream");
+        registrationBean.setName("HystrixMetricsStreamServlet");
+        return registrationBean;
+    }
+```
+- 在8001的pom.xml中引入：
+```xml
+<dependency>
+    <groupId>com.netflix.hystrix</groupId>
+    <artifactId>hystrix-metrics-event-stream</artifactId>
+    <version>1.5.18</version>
+</dependency> 
+```
+- 注意在9001中pom.xml引入：
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+    <version>2.2.7.RELEASE</version>
+</dependency>
 
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+<version>2.2.7.RELEASE</version>
+</dependency>
+```
+- 主启动类中声明：@EnableHystrixDashboard
+>解决hystrix dashboard中报错Unable to connect to Command Metric Stream
+- 需要在9001 application.properties中配置：
+```properties
+hystrix.dashboard.proxy-stream-allow-list=localhost
+```
+- 访问：http://localhost:9001/hystrix 监控：http://localhost:9001/hystrix 即可。
+
+2.服务网关，Zuul,gateway，主要是gateway
+
+### 2024-12-24
+
+1.SpingCloud Gateway, 参考：https://spring.io/projects/spring-cloud-gateway。
+- 路由，断言，过滤。
+2.Create new moudle,name is cloud-gateway-gateway9527
+- pom.xml引入：
+```xml
+        <!-- gateway -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+            <version>2.2.5.RELEASE</version>
+        </dependency>
+```
+- 第一种，通过application.yml配置路由规则：
+```yaml
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: payment-service-get
+          uri: http://localhost:8001
+          predicates:
+            - Path=/scs/payment/get/**
+        - id: payment-service-lb
+          uri: http://localhost:8001
+          predicates:
+            - Path=/scs/payment/lb/**
+```
+- 第二种，通过代码配置路由的方法
+```java
+    @Bean
+    public RouteLocator customRouteLocator(RouteLocatorBuilder routeLocatorBuilder){
+        RouteLocatorBuilder.Builder routes = routeLocatorBuilder.routes();
+
+        //代码配置路由
+        routes.route("path_route_payment_get",
+                r -> r.path("/news")
+                        .uri("https://www.google.com/news")).build();
+
+        return routes.build();
+    }
+```
+3.通过微服务名实现动态路由转发，修改yaml配置文件：
+```yaml
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true #开启从注册中心动态创建路由的功能，利用微服务进行路由
+      routes:
+        - id: payment-service-get
+          #uri: http://localhost:8001
+          uri: lb://cloud-payment-service #匹配后提供服务的路由地址
+          predicates:
+            - Path=/scs/payment/get/**
+        - id: payment-service-lb
+          #uri: http://localhost:8001
+          uri: lb://cloud-payment-service
+          predicates:
+            - Path=/scs/payment/lb/**
+        - id: payment-service-port
+          #uri: http://localhost:8001
+          uri: lb://cloud-payment-service
+          predicates:
+            - Path=/scs/payment/port/**
+```
+- lb:// 的作用   
+  •	lb:// 是 Spring Cloud LoadBalancer 提供的协议标识，用于表示将请求转发给服务注册中心（如 Eureka、Consul）中注册的服务实例。        
+  •	cloud-payment-service 是服务在服务注册中心中的名称，Gateway 会通过服务发现机制获取该服务的可用实例，并负载均衡地转发请求。
+
+- 动态路由举例：predicates
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: example-route
+          uri: http://localhost:8080
+          predicates:
+            - Path=/api/**, /user/**
+            - After=2024-12-24T10:00:00+08:00[Asia/Shanghai]
+            - Header=X-Request-Id, 12345
+            - Host=**.example.com
+            - Method=GET
+```
+4.gateway的filter使用:filters
+5.自定义过滤器globalFilter
+
+
+
+
+
+
+
+Netty
 
 
 

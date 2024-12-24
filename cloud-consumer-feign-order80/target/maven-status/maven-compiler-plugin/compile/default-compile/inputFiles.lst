@@ -1,0 +1,4 @@
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-consumer-feign-order80/src/main/java/com/cmg/spcl/config/FeignConfig.java
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-consumer-feign-order80/src/main/java/com/cmg/spcl/controller/OrderFeignController.java
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-consumer-feign-order80/src/main/java/com/cmg/spcl/OrderFeignMainApplication.java
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-consumer-feign-order80/src/main/java/com/cmg/spcl/service/PaymentFeignService.java

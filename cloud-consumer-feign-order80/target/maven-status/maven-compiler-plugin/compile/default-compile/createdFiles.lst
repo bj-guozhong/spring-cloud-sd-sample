@@ -1,0 +1,4 @@
+com/cmg/spcl/service/PaymentFeignService.class
+com/cmg/spcl/controller/OrderFeignController.class
+com/cmg/spcl/OrderFeignMainApplication.class
+com/cmg/spcl/config/FeignConfig.class

@@ -1,0 +1,5 @@
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-provider-hystrix-payment8001/src/main/java/com/cmg/spcl/service/PaymentService.java
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-provider-hystrix-payment8001/src/main/java/com/cmg/spcl/controller/PaymentController.java
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-provider-hystrix-payment8001/src/main/java/com/cmg/spcl/config/HystrixConfig.java
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-provider-hystrix-payment8001/src/main/java/com/cmg/spcl/PaymentHystrixMainApplication.java
+/Users/zgz/Documents/dev/IdeaProjects/spring-cloud-sd-sample/cloud-provider-hystrix-payment8001/src/main/java/com/cmg/spcl/config/WebConfig.java
