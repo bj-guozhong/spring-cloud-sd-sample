@@ -458,14 +458,119 @@ spring:
             - Host=**.example.com
             - Method=GET
 ```
-4.gateway的filter使用:filters
-5.自定义过滤器globalFilter
+4.gateway的filter使用:filters    
+5.自定义过滤器globalFilter,举例：
+```java
+@Component
+@Slf4j
+public class MyLogGateWayFilter implements GlobalFilter, Ordered {
+
+  @Override
+  public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain){
+    log.info("---------------come in here:"+new Date());
+    String uname = exchange.getRequest().getQueryParams().getFirst("uname");
+    if(StrUtil.isEmpty(uname)){
+      log.info("------------username is null,非法用户，不予放行");
+      exchange.getResponse().setStatusCode(HttpStatus.NOT_ACCEPTABLE);
+      return exchange.getResponse().setComplete();
+    }
+    return chain.filter(exchange);
+  }
+
+  @Override
+  public int getOrder(){
+    return 0;
+  }
+}
+```
+### 2024-12-25
+1.服务配置和服务总线，SpingCloud Config & SpringCloud Bus，熟悉了解  
+2.Create new moudle,name is cloud-config-center-3344
+- pom.xml
+```xml
+        <!-- spring cloud config server -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+            <version>2.2.7.RELEASE</version>
+        </dependency>
+```
+- 配置yml
+```yml
+spring:
+  application:
+    name: cloud-config-center
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/bj-guozhong/springcloud-config-sd.git
+          search-path:
+            - springcloud-config-sd
+      label: main
+```
+- github上新建配置项目springcloud-config-sd
+- 启动，访问：http://localhost:3344/main/config-gateway.yml 即可读取远程上的配置文件
+```xhell
+git remote add master https://xxx@github.com/bj-guozhong/springcloud-config-sd.git
+
+git push origin main
+```
+3.客户端3355读取读取配置中心3344
+- Create new moudle,name is cloud-config-client-3355
+- pom.xml
+```xml
+        <!-- spring cloud config client -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+            <version>2.2.7.RELEASE</version>
+        </dependency>
+```
+- 新的yml文件，application.yml是用户级的资源配置文件，bootstrap.yml文件是系统级的，优先级更高。
+```yml
+  application:
+    name: cloud-config-client
+  cloud:
+    config:
+      label: main
+      name: config
+      profile: dev
+      uri: http://localhost:3344
+```
+- 如果远端配置文件中有端口配置，它会覆盖本地bootstrap.yml中的3355端口。   
+4.github中修改了配置内容，3355微服务不会立刻生效，重启3355服务才可以。此时需要解决动态刷新配置的问题。
+- pom.xml 
+```xml
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+```
+- yml
+```yml
+# 暴露监控端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+```
+- controller增加注解
+```java
+@RefreshScope
+```
+- 运维人员修改配置中心内容后，需要发送post请求主动刷新:,手动刷新（缺点，需要运维人员去手动请求一批微服务）
+```xshell
+curl -X POST "http://localhost:3355/actuator/refresh"
+```
+5.消息总线 SpringCloud Bus,分布式自动刷新配置功能，配合SpringCloud Config使用，Bus支持两种消息代理：RabbitMQ和Kafka
 
 
 
 
-
-
+本项目：
+git push -u master master
 
 Netty
 

@@ -21,18 +21,15 @@ import java.util.Date;
 @Slf4j
 public class MyLogGateWayFilter implements GlobalFilter, Ordered {
 
-    //    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PaymentController.class);
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain){
         log.info("---------------come in here:"+new Date());
-
         String uname = exchange.getRequest().getQueryParams().getFirst("uname");
         if(StrUtil.isEmpty(uname)){
             log.info("------------username is null,非法用户，不予放行");
             exchange.getResponse().setStatusCode(HttpStatus.NOT_ACCEPTABLE);
             return exchange.getResponse().setComplete();
         }
-
         return chain.filter(exchange);
     }
 
