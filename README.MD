@@ -564,11 +564,67 @@ management:
 ```xshell
 curl -X POST "http://localhost:3355/actuator/refresh"
 ```
-5.消息总线 SpringCloud Bus,分布式自动刷新配置功能，配合SpringCloud Config使用，Bus支持两种消息代理：RabbitMQ和Kafka
+
+### 2024-12-26
+1.消息总线 SpringCloud Bus,分布式自动刷新配置功能，配合SpringCloud Config使用，Bus支持两种消息代理：RabbitMQ和Kafka
+2.安装erlang & RbbitMQ,参考：https://313390.xyz/index.php/archives/65/
+3.在3344配置微服务中心增加：
+- pom配置支持MQ：
+```xml
+        <!-- RabbitMQ -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+        </dependency>
+```
+- 在application.yml 增加：
+```yml
+  # add RabbitMQ config 
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    
+  # rabbitmq config,暴露BUS刷新配置的端点
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: 'bus-refresh'
+```
+4.在3355和3366客户端增加MQ支持,并进行全局广播，一次修改3355和3366都会自动刷新配置
+- pom.xml add:
+```xml
+        <!-- RabbitMQ -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+        </dependency>
+```
+- 在application.yml增加：
+```yml
+  # add RabbitMQ config 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+```
+- 配置完成后，刷新配置中心：
+```bash
+curl -X POST "http://localhost:3344/actuator/bus-refresh"
+```
+5.不想全局广播，定点通知，比如通知3355，不通知3366,参数：{destination}
+- 定点通知，其中cloud-config-client为3355应用中yml配置的spring-application-name
+```bash
+curl -X POST "http://localhost:3344/actuator/bus-refresh/cloud-config-client:3355"
+```
 
 
 
-
+圭亚那发以艰艰去那去那bfcvc去那bfcvc对她支
 本项目：
 git push -u master master
 

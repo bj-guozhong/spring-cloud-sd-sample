@@ -12,6 +12,12 @@ spring:
           search-path:
             - springcloud-config-sd
       label: main
+  # add RabbitMQ config
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
 eureka:
   client:
@@ -19,5 +25,12 @@ eureka:
       defaultZone: http://localhost:7001/eureka
     register-with-eureka: true
     fetch-registry: true
+
+# rabbitmq config,暴露BUS刷新配置的端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'bus-refresh'
 
 
