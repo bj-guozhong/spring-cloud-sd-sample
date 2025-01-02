@@ -85,11 +85,11 @@ eureka.client.fetch-registry=false
 eureka.client.service-url.defaultZone=http://${eureka.instance.hostname}:${server.port}/eureka/
 ```
 - 启动类声明：@EnableEurekaServer
-- 访问http://localhost:7001 即可看到Eureka的主页，里面包括注册进的8001微服务
+- 访问 http://localhost:7001 即可看到Eureka的主页，里面包括注册进的8001微服务
 
 ### 2024-12-04  
 1.Create new moudle,name is cloud-eureka-server7002,cloud-provider-payment8002,以支持集群服务   
-2.改造80微服务，增加配置：ApplicationContextConfig类，定义RestTemplate工具并注解@LoadBalanced以支持负载均衡的能力
+2.改造80微服务，增加配置：ApplicationContextConfig类，定义RestTemplate工具并注解@LoadBalanced以支持负载均衡的能力   
 3.改造controller中的微服务地址由http://localhost:8001改为http://CLOUD-PAYMENT-SERVICE，其中CLOUD-PAYMENT-SERVICE是8001和8002定义的微服务名称  
 4.修改8001|8002中的application.properties
 ```properties
@@ -97,15 +97,13 @@ eureka.client.service-url.defaultZone=http://${eureka.instance.hostname}:${serve
 eureka.client.service-url.defaultZone= http://localhost:7001/eureka 
 eureka.client.service-url.defaultZone=http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/
 ```
-集群相关配置：
+**集群相关配置：**
 ```markdown
-#1.etc/hosts add 127.0.0.1 eureka7001.com and  127.0.0.1 eureka7002.com
-#2.application.properties update hostname=eureka7001.com
-#3.service-url.defaultZone update http://eureka7002.com:7002/eureka/
-#4.8001 or 80 client update application.properties defaultZone update to http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/
+1.etc/hosts add 127.0.0.1 eureka7001.com and  127.0.0.1 eureka7002.com
+2.application.properties update hostname=eureka7001.com
+3.service-url.defaultZone update http://eureka7002.com:7002/eureka/
+4.8001 or 80 client update application.properties defaultZone update to http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/
 ```
-
-
 5.update application.properties配置支更改主机名并显示IP
 ```properties
 #Eureka config
@@ -624,7 +622,7 @@ curl -X POST "http://localhost:3344/actuator/bus-refresh/cloud-config-client:335
 
 
 
-圭亚那发以艰艰去那去那bfcvc去那bfcvc对她支
+
 本项目：
 git push -u master master
 
